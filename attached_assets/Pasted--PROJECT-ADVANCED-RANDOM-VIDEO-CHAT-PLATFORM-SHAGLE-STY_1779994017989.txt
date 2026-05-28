@@ -1,0 +1,309 @@
+🧠 PROJECT: ADVANCED RANDOM VIDEO CHAT PLATFORM (SHAGLE-STYLE)
+
+Build a full-stack real-time random video chat platform with:
+
+WebRTC peer-to-peer video calling
+Socket.IO matchmaking
+Supabase authentication system
+User profile system (gender, country, interests/keywords)
+Smart filtered matchmaking (Shagle-style logic)
+
+This must be production-ready, not a demo.
+
+⚙️ TECH STACK
+Frontend
+React (Vite or Next.js)
+TailwindCSS (glassmorphism UI like iOS / VisionOS)
+WebRTC (native or simple-peer)
+Socket.IO client
+Supabase client SDK
+Backend
+Node.js + Express
+Socket.IO server
+Supabase (auth + user profiles database)
+🔐 SUPABASE AUTH SYSTEM
+
+Implement Supabase authentication:
+
+Auth Methods:
+Email + password login
+Optional Google OAuth (if easy)
+After login:
+
+Redirect user to onboarding profile setup.
+
+👤 USER PROFILE SYSTEM (IMPORTANT)
+
+After signup/login, user MUST complete profile:
+
+Fields:
+username
+age (optional)
+gender (required)
+country (auto-detect via IP but editable)
+interests / keywords (VERY IMPORTANT)
+user enters tags like:
+"music, gaming, travel, anime, fitness, coding"
+
+Store in Supabase table: profiles
+
+🗄️ SUPABASE TABLE STRUCTURE
+Table: profiles
+id (uuid, auth user id)
+username (text)
+gender (text)
+country (text)
+age (int nullable)
+interests (text or array)
+created_at (timestamp)
+🎯 SMART MATCHMAKING (SHAGLE-LIKE FILTER SYSTEM)
+
+When user clicks “Start Chat”, allow filters:
+
+Filters UI:
+Gender preference:
+Everyone
+Male
+Female
+Country filter:
+Any
+Same country
+Specific country select
+Interest matching:
+Optional toggle:
+“Match with similar interests”
+🧠 MATCHING LOGIC (BACKEND)
+
+When matching users:
+
+Step 1: collect users in queue
+
+Each queued user includes:
+
+{
+  socketId,
+  gender,
+  country,
+  interests: ["music", "gaming"]
+}
+Step 2: filter matching rules
+
+Match only if:
+
+Gender rule:
+If user selected “Female only” → match only females
+If “Male only” → match only males
+Else → all genders
+Country rule:
+“Same country” → must match country
+Else → ignore
+Interest rule (optional):
+
+Calculate similarity score:
+
++1 point per shared keyword
+Prefer highest score match
+
+Example:
+
+score = sharedInterests.length
+
+Match highest score available.
+
+🎥 WEBRTC SYSTEM (UNCHANGED CORE)
+STUN server:
+stun:stun.l.google.com:19302
+Peer-to-peer video only
+Socket.IO used for signaling only
+
+Events:
+
+join_queue
+find_match
+match_found
+offer
+answer
+ice_candidate
+next
+disconnect
+🎨 UI REQUIREMENTS
+Style:
+Glassmorphism UI
+Dark futuristic theme
+Smooth animations
+Mobile-first responsive design
+Screens:
+1. Login Page
+Supabase login form
+2. Profile Setup Page
+Gender selection (required)
+Country dropdown
+Interests keyword input (tag style input UI)
+3. Home Page
+Start Chat button
+Filter panel (gender / country / interests toggle)
+4. Video Chat Page
+Main remote video
+Local preview
+Buttons:
+Next
+Stop
+Mute
+Camera toggle
+5. Matching Screen
+Animated “Finding someone who matches your preferences…”
+💎 PRO-FEATURE LOGIC (SIMULATED FREE VERSION)
+
+Even if no paid system exists:
+
+“Pro filter” = better matching priority
+Weighted matchmaking score
+Faster matching for users with complete profiles
+⚠️ IMPORTANT RULES
+Never fake video (must be real WebRTC)
+Must handle disconnects properly
+Must remove users from queue on logout
+Must avoid duplicate matches
+🚀 DEPLOYMENT
+
+Prepare for:
+
+Frontend: Vercel
+Backend: Render / Railway
+Supabase: hosted DB + auth
+
+Include environment variables setup:
+
+SUPABASE_URL
+SUPABASE_ANON_KEY
+SERVER_URL
+📦 FINAL RESULT
+
+User must be able to:
+
+✔ Sign up / login
+✔ Create profile with gender + interests
+✔ Get matched based on filters
+✔ Do real-time video chat
+✔ Click next and find better match
+✔ Work across devices
+
+ When two users are matched:
+
+Detect each user’s language (from profile or browser)
+Automatically translate incoming messages into the receiver’s language
+Keep original message stored for reference
+⚙️ TRANSLATION SYSTEM DESIGN
+OPTION A (RECOMMENDED – FREE TIER)
+
+Use LibreTranslate API (open-source, free/self-hostable)
+
+Example endpoint:
+
+https://libretranslate.de/translate
+OPTION B (PAID / SCALABLE)
+Google Translate API
+DeepL API (best quality)
+🗄️ UPDATE SUPABASE PROFILE
+
+Add field:
+
+language (text) DEFAULT 'en'
+💬 SOCKET.IO CHAT FLOW (UPDATED)
+
+When user sends message:
+
+Step 1: send message to server
+{
+  from,
+  to,
+  message,
+  originalLang
+}
+Step 2: backend detects receiver language
+receiverLang = user.language
+Step 3: translate message
+
+Call LibreTranslate:
+
+POST https://libretranslate.de/translate
+{
+  q: message,
+  source: originalLang || "auto",
+  target: receiverLang,
+  format: "text"
+}
+Step 4: emit translated message
+socket.emit("chat_message", {
+  translatedText,
+  originalText,
+  from
+});
+🧩 FRONTEND UI BEHAVIOR
+
+Each message bubble shows:
+
+Default view:
+translated text (main)
+Optional toggle:
+“Show original text”
+
+Example UI:
+
+👤 User:
+Hola amigo 👋
+[original: Hello friend]
+🌐 LANGUAGE DETECTION
+
+Use:
+
+Browser language:
+navigator.language
+OR Supabase profile language (preferred)
+🎨 UI FEATURE ADDITION
+
+Add toggle in chat UI:
+
+🌍 Auto Translate ON/OFF
+View original / translated switch
+Language indicator per user
+⚡ PERFORMANCE RULES
+Cache translations (important)
+Don’t translate same message twice
+Use debounce for fast chat
+
+Example:
+
+store translations in memory or Supabase table
+🗄️ OPTIONAL SUPABASE TABLE (CACHE)
+translations
+--------------------
+id
+original_text
+translated_text
+source_lang
+target_lang
+created_at
+🚀 UPDATED FINAL SYSTEM FEATURES
+
+Now your platform has:
+
+🔐 Auth
+Supabase login
+👤 Profiles
+gender
+country
+interests
+language
+🎯 Smart Matching
+gender filter
+country filter
+interest matching
+🎥 Video Chat
+WebRTC real-time
+💬 Chat System
+Socket.IO messaging
+🌍 Translation Layer (NEW)
+auto translate messages
+LibreTranslate integration
+optional original text view
