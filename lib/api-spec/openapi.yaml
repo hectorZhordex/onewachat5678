@@ -3,13 +3,17 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Random Video Chat Platform API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: profiles
+    description: User profile operations
+  - name: translations
+    description: Message translation operations
 paths:
   /healthz:
     get:
@@ -24,6 +28,80 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /profiles/me:
+    get:
+      operationId: getMyProfile
+      tags: [profiles]
+      summary: Get current user profile
+      parameters:
+        - in: header
+          name: x-user-id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Profile found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Profile"
+        "404":
+          description: Profile not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      operationId: upsertProfile
+      tags: [profiles]
+      summary: Create or update current user profile
+      parameters:
+        - in: header
+          name: x-user-id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfileInput"
+      responses:
+        "200":
+          description: Profile upserted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Profile"
+
+  /translations:
+    post:
+      operationId: translateMessage
+      tags: [translations]
+      summary: Translate a message
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TranslationRequest"
+      responses:
+        "200":
+          description: Translated message
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TranslationResponse"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +112,77 @@ components:
       required:
         - status
 
+    Profile:
+      type: object
+      required: [id, username, gender, language, createdAt]
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        gender:
+          type: string
+        country:
+          type: ["string", "null"]
+        age:
+          type: ["integer", "null"]
+        interests:
+          type: array
+          items:
+            type: string
+        language:
+          type: string
+        createdAt:
+          type: string
+
+    ProfileInput:
+      type: object
+      required: [username, gender]
+      properties:
+        username:
+          type: string
+          minLength: 1
+        gender:
+          type: string
+          enum: [male, female, other]
+        country:
+          type: ["string", "null"]
+        age:
+          type: ["integer", "null"]
+        interests:
+          type: array
+          items:
+            type: string
+        language:
+          type: string
+
+    TranslationRequest:
+      type: object
+      required: [text, targetLang]
+      properties:
+        text:
+          type: string
+        sourceLang:
+          type: ["string", "null"]
+        targetLang:
+          type: string
+
+    TranslationResponse:
+      type: object
+      required: [translatedText, originalText, targetLang]
+      properties:
+        translatedText:
+          type: string
+        originalText:
+          type: string
+        targetLang:
+          type: string
+        sourceLang:
+          type: ["string", "null"]
+
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string

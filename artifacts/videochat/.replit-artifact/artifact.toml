@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Random Video Chat"
+version = "1.0.0"
+id = "artifacts/videochat"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19738
+
+[services.development]
+run = "pnpm --filter @workspace/videochat run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/videochat", "run", "build" ]
+publicDir = "artifacts/videochat/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19738"
+BASE_PATH = "/"
