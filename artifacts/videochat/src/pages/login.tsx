@@ -38,8 +38,10 @@ export default function Login() {
 
   const handleGoogle = async () => {
     try {
+      const redirectTo = `${window.location.origin}/auth/callback`;
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
+        options: { redirectTo },
       });
       if (error) throw error;
     } catch (err: any) {

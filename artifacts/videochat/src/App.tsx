@@ -11,6 +11,7 @@ import Onboarding from "@/pages/onboarding";
 import Home from "@/pages/home";
 import Chat from "@/pages/chat";
 import Profile from "@/pages/profile";
+import AuthCallback from "@/pages/auth-callback";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ function Router() {
       <Route path="/home" component={() => <ProtectedRoute component={Home} />} />
       <Route path="/chat" component={() => <ProtectedRoute component={Chat} />} />
       <Route path="/profile" component={() => <ProtectedRoute component={Profile} />} />
+      <Route path="/auth/callback" component={AuthCallback} />
       <Route component={NotFound} />
     </Switch>
   );
