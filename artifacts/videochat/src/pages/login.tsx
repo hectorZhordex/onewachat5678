@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useLocation } from "wouter";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ShieldCheck } from "lucide-react";
 import logo from "/logo.png";
 import TermsModal from "@/components/terms-modal";
-import CursorGlow from "@/components/cursor-glow";
+import AnimatedBackground from "@/components/animated-background";
 
 const year = new Date().getFullYear();
 
@@ -16,6 +16,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
+  const [overCard, setOverCard] = useState(false);
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
@@ -41,81 +42,48 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center relative overflow-hidden"
-      style={{ background: "#05060a" }}>
-
+    <div
+      className="min-h-screen w-full flex flex-col items-center justify-center relative overflow-hidden"
+      style={{ background: "#05060a" }}
+    >
       {/* Terms modal */}
       <TermsModal />
 
-      {/* Cursor glow — desktop only */}
-      <CursorGlow />
+      {/* Animated blobs + water ripple + cursor glow */}
+      <AnimatedBackground overCard={overCard} />
 
-      {/* Animated floating blobs */}
+      {/* Login card — mouse enter/leave toggles effects */}
       <div
-        className="absolute rounded-full pointer-events-none"
-        style={{
-          width: 420, height: 420,
-          background: "#884cff",
-          filter: "blur(120px)",
-          opacity: 0.28,
-          top: "10%", left: "15%",
-          animation: "blob-float-1 14s ease-in-out infinite",
-        }}
-      />
-      <div
-        className="absolute rounded-full pointer-events-none"
-        style={{
-          width: 320, height: 320,
-          background: "#5b2fff",
-          filter: "blur(110px)",
-          opacity: 0.22,
-          bottom: "12%", right: "12%",
-          animation: "blob-float-2 18s ease-in-out infinite",
-        }}
-      />
-      <div
-        className="absolute rounded-full pointer-events-none"
-        style={{
-          width: 250, height: 250,
-          background: "#c040ff",
-          filter: "blur(100px)",
-          opacity: 0.16,
-          top: "55%", left: "60%",
-          animation: "blob-float-3 11s ease-in-out infinite",
-        }}
-      />
-      <div
-        className="absolute rounded-full pointer-events-none"
-        style={{
-          width: 200, height: 200,
-          background: "#884cff",
-          filter: "blur(90px)",
-          opacity: 0.14,
-          top: "5%", right: "25%",
-          animation: "blob-float-2 16s ease-in-out infinite reverse",
-        }}
-      />
-
-      {/* Login card */}
-      <div className="z-10 w-full max-w-md px-4">
-        <div className="relative p-8 rounded-3xl animate-in fade-in zoom-in duration-700"
+        className="z-10 w-full max-w-md px-4"
+        onMouseEnter={() => setOverCard(true)}
+        onMouseLeave={() => setOverCard(false)}
+      >
+        <div
+          className="relative p-8 rounded-3xl animate-in fade-in zoom-in duration-700"
           style={{
-            background: "rgba(12, 10, 22, 0.75)",
+            background: "rgba(12, 10, 22, 0.78)",
             backdropFilter: "blur(24px)",
             WebkitBackdropFilter: "blur(24px)",
-            border: "1px solid rgba(136, 76, 255, 0.2)",
-            boxShadow: "0 0 60px rgba(136, 76, 255, 0.15), 0 8px 32px rgba(0,0,0,0.6)",
-          }}>
-
-          {/* Purple glow behind card */}
-          <div className="absolute inset-0 rounded-3xl pointer-events-none"
+            border: "1px solid rgba(136, 76, 255, 0.18)",
+            boxShadow: "0 0 50px rgba(136, 76, 255, 0.12), 0 8px 32px rgba(0,0,0,0.6)",
+          }}
+        >
+          {/* Subtle top-glow inside card */}
+          <div
+            className="absolute inset-0 rounded-3xl pointer-events-none"
             style={{
-              background: "radial-gradient(ellipse at 50% 0%, rgba(136,76,255,0.12) 0%, transparent 60%)",
+              background: "radial-gradient(ellipse at 50% 0%, rgba(136,76,255,0.08) 0%, transparent 55%)",
             }}
           />
 
           <div className="relative flex flex-col items-center mb-8">
-            <img src={logo} alt="OneChat" className="w-14 h-14 object-contain mb-3 drop-shadow-[0_0_12px_rgba(136,76,255,0.6)]" />
+            {/* Logo — reduced glow */}
+            <img
+              src={logo}
+              alt="OneChat"
+              className="w-14 h-14 object-contain mb-3"
+              style={{ filter: "drop-shadow(0 0 6px rgba(136,76,255,0.35))" }}
+            />
             <h1 className="text-3xl font-bold tracking-tight text-white mb-1">OneChat</h1>
             <p className="text-white/50 text-sm">Meet the world. One click at a time.</p>
           </div>
@@ -145,7 +113,7 @@ export default function Login() {
             <Button
               type="submit"
               className="w-full h-12 bg-primary hover:bg-primary/90 text-white rounded-xl font-medium transition-all"
-              style={{ boxShadow: "0 0 20px rgba(136,76,255,0.4)" }}
+              style={{ boxShadow: "0 0 18px rgba(136,76,255,0.35)" }}
               disabled={loading}
               data-testid="button-submit"
             >
@@ -176,7 +144,7 @@ export default function Login() {
 
       {/* Footer */}
       <footer className="z-10 mt-8 text-center">
-        <p className="text-xs text-white/25">
+        <p className="text-xs text-white/20">
           © OneChat {year}. All Rights Reserved.
         </p>
       </footer>

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useLocation } from "wouter";
+import AnimatedBackground from "@/components/animated-background";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUpsertProfile } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
@@ -103,12 +104,19 @@ export default function Onboarding() {
     });
   };
 
-  return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center p-6 relative overflow-hidden">
-      <div className="absolute top-[-10%] right-[-5%] w-[40rem] h-[40rem] bg-primary/10 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] left-[-10%] w-[30rem] h-[30rem] bg-accent/10 rounded-full blur-[100px] pointer-events-none" />
+  const [overCard, setOverCard] = useState(false);
 
-      <div className="w-full max-w-xl glass-panel rounded-3xl p-8 relative z-10 animate-in slide-in-from-bottom-8 duration-700">
+  return (
+    <div className="min-h-screen text-foreground flex flex-col items-center justify-center p-6 relative overflow-hidden"
+      style={{ background: "#05060a" }}>
+
+      <AnimatedBackground overCard={overCard} />
+
+      <div
+        className="w-full max-w-xl glass-panel rounded-3xl p-8 relative z-10 animate-in slide-in-from-bottom-8 duration-700"
+        onMouseEnter={() => setOverCard(true)}
+        onMouseLeave={() => setOverCard(false)}
+      >
         <div className="flex flex-col items-center mb-10 text-center">
           <img src={logo} alt="OneChat" className="w-14 h-14 object-contain mb-2" />
           <h1 className="text-3xl font-bold mb-2">Create Your Persona</h1>
