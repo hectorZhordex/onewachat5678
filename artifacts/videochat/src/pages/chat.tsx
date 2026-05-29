@@ -144,7 +144,8 @@ export default function Chat() {
         }
       }
 
-      const socket = io(window.location.origin, {
+      const apiOrigin = import.meta.env.VITE_API_URL || window.location.origin;
+      const socket = io(apiOrigin, {
         path: "/api/socket.io",
         transports: ["websocket"]
       });
