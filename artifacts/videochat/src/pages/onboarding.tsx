@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { X, Sparkles, Languages } from "lucide-react";
+import { X, Languages } from "lucide-react";
 import { ProfileInputGender } from "@workspace/api-client-react/src/generated/api.schemas";
 import { COUNTRIES } from "@/lib/countries";
-import { supabase } from "@/lib/supabase";
+import logo from "/logo.png";
 
 const LANGUAGES = [
   { value: "en", label: "English" },
@@ -39,7 +39,9 @@ export default function Onboarding() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
-  const upsertProfile = useUpsertProfile();
+  const upsertProfile = useUpsertProfile({
+    request: { headers: { 'x-user-id': user?.id || '' } }
+  });
 
   const [username, setUsername] = useState(profile?.username || "");
   const [gender, setGender] = useState<ProfileInputGender | "">(profile?.gender as ProfileInputGender || "");
@@ -70,17 +72,13 @@ export default function Onboarding() {
     setInterests(interests.filter(tag => tag !== tagToRemove));
   };
 
-  const handleSave = async () => {
+  const handleSave = () => {
     if (!username.trim() || !gender || !country) {
       toast({ title: "Please fill all required fields", variant: "destructive" });
       return;
     }
 
-    // Get fresh session to avoid race conditions after sign-in
-    const { data: { session } } = await supabase.auth.getSession();
-    const userId = session?.user?.id || user?.id || "";
-
-    if (!userId) {
+    if (!user?.id) {
       toast({ title: "Session expired", description: "Please sign in again.", variant: "destructive" });
       setLocation("/login");
       return;
@@ -94,7 +92,6 @@ export default function Onboarding() {
         interests,
         language
       },
-      request: { headers: { 'x-user-id': userId } }
     }, {
       onSuccess: () => {
         toast({ title: "Profile saved!" });
@@ -113,9 +110,7 @@ export default function Onboarding() {
 
       <div className="w-full max-w-xl glass-panel rounded-3xl p-8 relative z-10 animate-in slide-in-from-bottom-8 duration-700">
         <div className="flex flex-col items-center mb-10 text-center">
-          <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mb-6 shadow-[0_0_20px_hsl(var(--primary)/0.2)]">
-            <Sparkles className="w-8 h-8 text-primary" />
-          </div>
+          <img src={logo} alt="ChatSphere" className="w-14 h-14 object-contain mb-2" />
           <h1 className="text-3xl font-bold mb-2">Create Your Persona</h1>
           <p className="text-muted-foreground">Setup your profile to find better matches.</p>
         </div>

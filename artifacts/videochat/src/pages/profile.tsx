@@ -31,7 +31,9 @@ export default function Profile() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   
-  const upsertProfile = useUpsertProfile();
+  const upsertProfile = useUpsertProfile({
+    request: { headers: { 'x-user-id': user?.id || '' } }
+  });
   
   const [username, setUsername] = useState(profile?.username || "");
   const [gender, setGender] = useState<ProfileInputGender | "">(profile?.gender as ProfileInputGender || "");
@@ -79,7 +81,6 @@ export default function Profile() {
         interests,
         language
       },
-      request: { headers: { 'x-user-id': user?.id || "" } }
     }, {
       onSuccess: () => {
         toast({ title: "Profile updated successfully!" });
