@@ -1,0 +1,140 @@
+TASK: FIX ONECHAT MATCHMAKING STUCK STATE
+
+The app is stuck on:
+
+“Looking for someone to chat with… Matching based on your preferences”
+
+Users are NOT being matched even when multiple users are online.
+
+and also its not mobile friedly not responsive to everyscreen need it mobile friendly
+
+❗ GOAL
+
+Fix the matchmaking system so that:
+
+✔ 2 users in queue are instantly matched
+✔ match_found event is triggered
+✔ loading screen disappears
+✔ users enter video call state
+
+🔍 STEP-BY-STEP DEBUG INSTRUCTIONS
+STEP 1 — VERIFY QUEUE SYSTEM (CRITICAL)
+
+Check backend queue logic:
+
+Ensure there is a global queue array like:
+let queue = [];
+
+Fix if:
+
+queue is inside socket handler (❌ WRONG)
+queue resets per connection (❌ WRONG)
+users are not added properly
+STEP 2 — FIX JOIN QUEUE LOGIC
+
+When user joins, MUST do:
+
+socket.on("join_queue", (data) => {
+  socket.userData = data;
+
+  queue.push(socket);
+
+  tryMatch();
+});
+STEP 3 — IMPLEMENT MATCH FUNCTION (MOST IMPORTANT)
+
+Ensure this exists and is called:
+
+function tryMatch() {
+  if (queue.length < 2) return;
+
+  const user1 = queue.shift();
+  const user2 = queue.shift();
+
+  if (!user1 || !user2) return;
+
+  user1.partner = user2.id;
+  user2.partner = user1.id;
+
+  user1.emit("match_found", { partnerId: user2.id });
+  user2.emit("match_found", { partnerId: user1.id });
+}
+STEP 4 — FIX FILTER LOGIC (COMMON BUG)
+
+If you use filters (gender/country/interests):
+
+TEMPORARILY DISABLE filtering and test basic matching first.
+
+Fix:
+
+REMOVE all filtering conditions
+Match ANY two users first
+
+Then re-enable filters later.
+
+STEP 5 — VERIFY CLIENT EVENT LISTENER
+
+Frontend MUST listen:
+
+socket.on("match_found", (data) => {
+  console.log("Matched:", data);
+
+  setLoading(false);
+  setMatched(true);
+  setPartnerId(data.partnerId);
+});
+
+Fix if:
+
+event name mismatch
+state not updating
+loading screen never closes
+STEP 6 — FIX DUPLICATE QUEUE ISSUE
+
+Ensure user is NOT added multiple times:
+
+queue = queue.filter(s => s.id !== socket.id);
+
+before pushing.
+
+STEP 7 — HANDLE DISCONNECTS PROPERLY
+socket.on("disconnect", () => {
+  queue = queue.filter(s => s.id !== socket.id);
+});
+STEP 8 — ADD DEBUG LOGS (MANDATORY)
+
+Add logs in backend:
+
+user joined queue
+queue length
+tryMatch triggered
+match created
+
+Example:
+
+console.log("Queue size:", queue.length);
+STEP 9 — TEST CASE REQUIREMENTS
+
+After fix, ensure:
+
+TEST 1
+open 2 browsers
+both click start
+✔ they must match instantly
+TEST 2
+open 3 users
+✔ 2 match, 1 waits
+🚨 ROOT CAUSE (LIKELY)
+
+Most common real bug:
+
+❌ queue is inside socket handler → resets every connection
+❌ tryMatch() never called
+❌ match_found event name mismatch
+❌ filtering blocks all matches
+
+🎯 FINAL RESULT REQUIRED
+No infinite loading screen
+Immediate pairing
+Reliable match_found trigger
+Stable queue system

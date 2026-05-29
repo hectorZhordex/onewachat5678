@@ -244,42 +244,51 @@ export default function Chat() {
         <div className="absolute top-[-10%] right-[-5%] w-[30rem] h-[30rem] bg-primary/10 rounded-full blur-[100px] pointer-events-none" />
 
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 bg-black/20 backdrop-blur-xl z-10">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-primary/20 flex items-center justify-center border border-primary/30">
-              <MessageSquare className="w-5 h-5 text-primary" />
+        <div className="flex items-center justify-between px-4 md:px-6 py-3 md:py-4 border-b border-white/5 bg-black/20 backdrop-blur-xl z-10 gap-2">
+          <div className="flex items-center gap-2 md:gap-3 min-w-0">
+            <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl bg-primary/20 flex items-center justify-center border border-primary/30 shrink-0">
+              <MessageSquare className="w-4 h-4 md:w-5 md:h-5 text-primary" />
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="font-semibold text-white text-sm">Text Chat</p>
               <p className={`text-xs ${status === "connected" ? "text-green-400" : "text-yellow-400"}`}>
                 {status === "connected" ? "Connected" : "Searching..."}
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2 text-xs text-white/50 mr-3">
-              <Languages className="w-4 h-4" />
-              <span>Auto-translate</span>
+          <div className="flex items-center gap-1.5 md:gap-2 shrink-0">
+            <div className="hidden sm:flex items-center gap-2 text-xs text-white/50 mr-1">
+              <Languages className="w-3.5 h-3.5" />
               <Switch checked={isTranslating} onCheckedChange={setIsTranslating} className="scale-75" />
             </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsTranslating(v => !v)}
+              className={`sm:hidden w-8 h-8 rounded-lg ${isTranslating ? "text-primary bg-primary/10" : "text-white/50"}`}
+            >
+              <Languages className="w-4 h-4" />
+            </Button>
             <Button
               variant="outline"
               size="sm"
               onClick={handleNext}
               disabled={status === "searching"}
-              className="border-white/10 hover:bg-white/10 text-white/80 text-xs"
+              className="border-white/10 hover:bg-white/10 text-white/80 text-xs h-8 px-2 md:px-3"
               data-testid="button-next"
             >
-              <SkipForward className="w-3.5 h-3.5 mr-1" /> Next
+              <SkipForward className="w-3.5 h-3.5 md:mr-1" />
+              <span className="hidden md:inline">Next</span>
             </Button>
             <Button
               variant="destructive"
               size="sm"
               onClick={handleStop}
-              className="text-xs"
+              className="text-xs h-8 px-2 md:px-3"
               data-testid="button-stop"
             >
-              <PhoneOff className="w-3.5 h-3.5 mr-1" /> Leave
+              <PhoneOff className="w-3.5 h-3.5 md:mr-1" />
+              <span className="hidden md:inline">Leave</span>
             </Button>
           </div>
         </div>

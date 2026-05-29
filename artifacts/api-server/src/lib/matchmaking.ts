@@ -8,16 +8,12 @@ interface QueuedUser {
   country: string | null;
   interests: string[];
   language: string;
+  mode: string;
   filters: {
     genderPreference: string;
     countryFilter: string;
     interestMatch: boolean;
   };
-}
-
-interface ActivePair {
-  socketId1: string;
-  socketId2: string;
 }
 
 const queue: QueuedUser[] = [];
@@ -30,22 +26,20 @@ function calcInterestScore(a: string[], b: string[]): number {
 }
 
 function isCompatible(seeker: QueuedUser, candidate: QueuedUser): boolean {
-  // Gender filter
-  if (seeker.filters.genderPreference !== "everyone") {
+  // Gender filter — frontend sends "any", "male", or "female"
+  if (seeker.filters.genderPreference !== "any") {
     if (candidate.gender !== seeker.filters.genderPreference) return false;
   }
-  if (candidate.filters.genderPreference !== "everyone") {
+  if (candidate.filters.genderPreference !== "any") {
     if (seeker.gender !== candidate.filters.genderPreference) return false;
   }
 
-  // Country filter
-  if (seeker.filters.countryFilter === "same") {
-    if (!seeker.country || !candidate.country) return false;
-    if (seeker.country !== candidate.country) return false;
+  // Country filter — frontend sends "any" or a specific country name
+  if (seeker.filters.countryFilter !== "any") {
+    if (candidate.country !== seeker.filters.countryFilter) return false;
   }
-  if (candidate.filters.countryFilter === "same") {
-    if (!seeker.country || !candidate.country) return false;
-    if (seeker.country !== candidate.country) return false;
+  if (candidate.filters.countryFilter !== "any") {
+    if (seeker.country !== candidate.filters.countryFilter) return false;
   }
 
   return true;
@@ -81,6 +75,7 @@ export function setupSocketIO(io: SocketIOServer): void {
         country: string | null;
         interests: string[];
         language: string;
+        mode?: string;
         filters: {
           genderPreference: string;
           countryFilter: string;
@@ -89,7 +84,7 @@ export function setupSocketIO(io: SocketIOServer): void {
       }) => {
         socketUserMap.set(socket.id, data.userId);
 
-        // Remove any existing queue entry for this socket
+        // Remove any existing queue entry for this socket (prevents duplicates)
         const existingIdx = queue.findIndex((u) => u.socketId === socket.id);
         if (existingIdx !== -1) queue.splice(existingIdx, 1);
 
@@ -100,15 +95,19 @@ export function setupSocketIO(io: SocketIOServer): void {
           country: data.country || null,
           interests: data.interests || [],
           language: data.language || "en",
+          mode: data.mode || "video",
           filters: {
-            genderPreference: data.filters?.genderPreference || "everyone",
+            genderPreference: data.filters?.genderPreference || "any",
             countryFilter: data.filters?.countryFilter || "any",
             interestMatch: data.filters?.interestMatch || false,
           },
         };
 
         queue.push(queued);
-        logger.info({ socketId: socket.id, queueSize: queue.length }, "User joined queue");
+        logger.info(
+          { socketId: socket.id, userId: data.userId, queueSize: queue.length },
+          "User joined queue",
+        );
 
         attemptMatch(io, queued);
       },
@@ -151,7 +150,13 @@ export function setupSocketIO(io: SocketIOServer): void {
 
 function attemptMatch(io: SocketIOServer, seeker: QueuedUser): void {
   const match = findBestMatch(seeker);
-  if (!match) return;
+  if (!match) {
+    logger.info(
+      { socketId: seeker.socketId, queueSize: queue.length },
+      "No match found yet, waiting in queue",
+    );
+    return;
+  }
 
   // Remove both from queue
   const seekerIdx = queue.findIndex((u) => u.socketId === seeker.socketId);
@@ -164,20 +169,20 @@ function attemptMatch(io: SocketIOServer, seeker: QueuedUser): void {
   activePairs.set(match.socketId, seeker.socketId);
 
   logger.info(
-    { seeker: seeker.socketId, match: match.socketId },
-    "Match found",
+    { seeker: seeker.socketId, match: match.socketId, queueSize: queue.length },
+    "Match found — emitting match_found to both",
   );
 
-  // Seeker initiates the WebRTC offer
+  // NOTE: frontend checks data.initiator (not isInitiator)
   io.to(seeker.socketId).emit("match_found", {
     partnerId: match.socketId,
     partnerLanguage: match.language,
-    isInitiator: true,
+    initiator: true,
   });
   io.to(match.socketId).emit("match_found", {
     partnerId: seeker.socketId,
     partnerLanguage: seeker.language,
-    isInitiator: false,
+    initiator: false,
   });
 }
 
@@ -186,12 +191,12 @@ function disconnectPeer(io: SocketIOServer, socketId: string): void {
   const queueIdx = queue.findIndex((u) => u.socketId === socketId);
   if (queueIdx !== -1) queue.splice(queueIdx, 1);
 
-  // Notify partner
+  // Notify partner — frontend listens for "disconnect_peer"
   const partnerId = activePairs.get(socketId);
   if (partnerId) {
     activePairs.delete(socketId);
     activePairs.delete(partnerId);
-    io.to(partnerId).emit("partner_disconnected");
+    io.to(partnerId).emit("disconnect_peer");
     logger.info({ socketId, partnerId }, "Peer disconnected from pair");
   }
 }

@@ -49,26 +49,26 @@ export default function Home() {
       <div className="absolute bottom-[10%] left-[10%] w-[40rem] h-[40rem] bg-accent/10 rounded-full blur-[120px] pointer-events-none" />
 
       {/* Header */}
-      <header className="w-full max-w-5xl flex justify-between items-center mb-12 z-10 glass-panel rounded-2xl px-6 py-4 mt-4">
-        <div className="flex items-center gap-3">
-          <img src={logo} alt="OneChat" className="w-9 h-9 object-contain" />
-          <span className="text-xl font-bold tracking-tight">OneChat</span>
+      <header className="w-full max-w-5xl flex justify-between items-center mb-6 md:mb-12 z-10 glass-panel rounded-2xl px-4 md:px-6 py-3 md:py-4 mt-4">
+        <div className="flex items-center gap-2 md:gap-3">
+          <img src={logo} alt="OneChat" className="w-8 h-8 md:w-9 md:h-9 object-contain" />
+          <span className="text-lg md:text-xl font-bold tracking-tight">OneChat</span>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/40 border border-white/5">
+        <div className="flex items-center gap-2 md:gap-4">
+          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/40 border border-white/5">
             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
             <span className="text-sm font-medium text-white/80">{onlineCount.toLocaleString()} online</span>
           </div>
-          <Button variant="ghost" size="icon" className="rounded-full hover:bg-white/10" onClick={() => setLocation("/profile")} data-testid="button-profile">
-            <Settings className="w-5 h-5" />
+          <Button variant="ghost" size="icon" className="rounded-full hover:bg-white/10 w-9 h-9" onClick={() => setLocation("/profile")} data-testid="button-profile">
+            <Settings className="w-4 h-4 md:w-5 md:h-5" />
           </Button>
-          <Button variant="ghost" size="icon" className="rounded-full hover:bg-destructive/20 hover:text-destructive text-white/70" onClick={signOut} data-testid="button-logout">
-            <LogOut className="w-5 h-5" />
+          <Button variant="ghost" size="icon" className="rounded-full hover:bg-destructive/20 hover:text-destructive text-white/70 w-9 h-9" onClick={signOut} data-testid="button-logout">
+            <LogOut className="w-4 h-4 md:w-5 md:h-5" />
           </Button>
         </div>
       </header>
 
-      <main className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-8 z-10">
+      <main className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-8 z-10 pb-8">
         
         {/* Profile Summary Card */}
         <div className="lg:col-span-4 flex flex-col gap-6">
@@ -95,55 +95,55 @@ export default function Home() {
 
         {/* Main Action Area */}
         <div className="lg:col-span-8 flex flex-col gap-6">
-          <div className="glass-panel rounded-3xl p-8 flex flex-col items-center justify-center min-h-[400px] relative overflow-hidden">
+          <div className="glass-panel rounded-3xl p-5 md:p-8 flex flex-col items-center justify-center min-h-[360px] md:min-h-[400px] relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-primary/5 pointer-events-none" />
 
-            <div className="text-center mb-8 z-10">
-              <h2 className="text-4xl font-bold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-white to-white/60">How do you want to chat?</h2>
-              <p className="text-muted-foreground text-lg">Pick a mode to get started.</p>
+            <div className="text-center mb-6 md:mb-8 z-10">
+              <h2 className="text-2xl md:text-4xl font-bold mb-2 md:mb-3 bg-clip-text text-transparent bg-gradient-to-r from-white to-white/60">How do you want to chat?</h2>
+              <p className="text-muted-foreground text-sm md:text-lg">Pick a mode to get started.</p>
             </div>
 
             {/* Mode Selection Cards */}
-            <div className="w-full grid grid-cols-2 gap-4 mb-8 z-10 px-2">
+            <div className="w-full grid grid-cols-2 gap-3 md:gap-4 mb-6 md:mb-8 z-10">
               <button
                 onClick={() => setChatMode("text")}
                 data-testid="card-text-mode"
-                className={`relative flex flex-col items-center gap-3 p-6 rounded-2xl border-2 transition-all duration-200 text-left group cursor-pointer ${
+                className={`relative flex flex-col items-center gap-2 md:gap-3 p-4 md:p-6 rounded-2xl border-2 transition-all duration-200 text-left group cursor-pointer ${
                   chatMode === "text"
                     ? "border-primary bg-primary/15 shadow-[0_0_24px_hsl(var(--primary)/0.3)]"
                     : "border-white/10 bg-black/30 hover:border-white/30 hover:bg-black/40"
                 }`}
               >
                 {chatMode === "text" && (
-                  <CheckCircle2 className="absolute top-3 right-3 w-5 h-5 text-primary" />
+                  <CheckCircle2 className="absolute top-2 right-2 md:top-3 md:right-3 w-4 h-4 md:w-5 md:h-5 text-primary" />
                 )}
-                <div className={`w-14 h-14 rounded-xl flex items-center justify-center ${chatMode === "text" ? "bg-primary/30" : "bg-white/10 group-hover:bg-white/15"} transition-colors`}>
-                  <MessageSquare className={`w-7 h-7 ${chatMode === "text" ? "text-primary" : "text-white/70"}`} />
+                <div className={`w-10 h-10 md:w-14 md:h-14 rounded-xl flex items-center justify-center ${chatMode === "text" ? "bg-primary/30" : "bg-white/10 group-hover:bg-white/15"} transition-colors`}>
+                  <MessageSquare className={`w-5 h-5 md:w-7 md:h-7 ${chatMode === "text" ? "text-primary" : "text-white/70"}`} />
                 </div>
                 <div>
-                  <p className={`font-bold text-lg ${chatMode === "text" ? "text-white" : "text-white/80"}`}>Text Chat</p>
-                  <p className="text-xs text-white/50 mt-1">Messages only — no camera or mic needed</p>
+                  <p className={`font-bold text-sm md:text-lg ${chatMode === "text" ? "text-white" : "text-white/80"}`}>Text Chat</p>
+                  <p className="text-[11px] md:text-xs text-white/50 mt-0.5 md:mt-1">No camera needed</p>
                 </div>
               </button>
 
               <button
                 onClick={() => setChatMode("video")}
                 data-testid="card-video-mode"
-                className={`relative flex flex-col items-center gap-3 p-6 rounded-2xl border-2 transition-all duration-200 text-left group cursor-pointer ${
+                className={`relative flex flex-col items-center gap-2 md:gap-3 p-4 md:p-6 rounded-2xl border-2 transition-all duration-200 text-left group cursor-pointer ${
                   chatMode === "video"
                     ? "border-primary bg-primary/15 shadow-[0_0_24px_hsl(var(--primary)/0.3)]"
                     : "border-white/10 bg-black/30 hover:border-white/30 hover:bg-black/40"
                 }`}
               >
                 {chatMode === "video" && (
-                  <CheckCircle2 className="absolute top-3 right-3 w-5 h-5 text-primary" />
+                  <CheckCircle2 className="absolute top-2 right-2 md:top-3 md:right-3 w-4 h-4 md:w-5 md:h-5 text-primary" />
                 )}
-                <div className={`w-14 h-14 rounded-xl flex items-center justify-center ${chatMode === "video" ? "bg-primary/30" : "bg-white/10 group-hover:bg-white/15"} transition-colors`}>
-                  <Video className={`w-7 h-7 ${chatMode === "video" ? "text-primary" : "text-white/70"}`} />
+                <div className={`w-10 h-10 md:w-14 md:h-14 rounded-xl flex items-center justify-center ${chatMode === "video" ? "bg-primary/30" : "bg-white/10 group-hover:bg-white/15"} transition-colors`}>
+                  <Video className={`w-5 h-5 md:w-7 md:h-7 ${chatMode === "video" ? "text-primary" : "text-white/70"}`} />
                 </div>
                 <div>
-                  <p className={`font-bold text-lg ${chatMode === "video" ? "text-white" : "text-white/80"}`}>Video Chat</p>
-                  <p className="text-xs text-white/50 mt-1">Live video + text with your match</p>
+                  <p className={`font-bold text-sm md:text-lg ${chatMode === "video" ? "text-white" : "text-white/80"}`}>Video Chat</p>
+                  <p className="text-[11px] md:text-xs text-white/50 mt-0.5 md:mt-1">Live video + text</p>
                 </div>
               </button>
             </div>
@@ -151,7 +151,7 @@ export default function Home() {
             <Button
               onClick={handleStartChat}
               disabled={!chatMode}
-              className="group relative w-64 h-16 bg-primary hover:bg-primary/90 rounded-2xl text-lg font-bold shadow-[0_0_40px_hsl(var(--primary)/0.5)] hover:shadow-[0_0_60px_hsl(var(--primary)/0.7)] transition-all duration-300 overflow-hidden disabled:opacity-40 disabled:cursor-not-allowed z-10"
+              className="group relative w-full max-w-xs h-14 md:h-16 bg-primary hover:bg-primary/90 rounded-2xl text-base md:text-lg font-bold shadow-[0_0_40px_hsl(var(--primary)/0.5)] hover:shadow-[0_0_60px_hsl(var(--primary)/0.7)] transition-all duration-300 overflow-hidden disabled:opacity-40 disabled:cursor-not-allowed z-10"
               data-testid="button-start-chat"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-[200%] group-hover:translate-x-[200%] transition-transform duration-1000" />
