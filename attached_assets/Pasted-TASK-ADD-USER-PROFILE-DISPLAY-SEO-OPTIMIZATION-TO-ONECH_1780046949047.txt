@@ -1,0 +1,128 @@
+TASK: ADD USER PROFILE DISPLAY + SEO OPTIMIZATION TO ONECHAT
+
+The matchmaking system is now working.
+
+Next upgrade:
+
+👤 FEATURE 1 — SHOW PARTNER DETAILS ON MATCH
+
+When two users are matched:
+
+Each user must see:
+
+username
+country
+gender
+🔧 STEP 1 — SEND USER PROFILE WITH SOCKET
+
+Update join_queue to include full profile:
+
+socket.on("join_queue", (data) => {
+  socket.userData = {
+    id: socket.id,
+    username: data.username,
+    country: data.country,
+    gender: data.gender
+  };
+
+  queue = queue.filter(s => s.id !== socket.id);
+  queue.push(socket);
+
+  tryMatch();
+});
+🔧 STEP 2 — SEND FULL PROFILE ON MATCH
+
+Update match function:
+
+function tryMatch() {
+  if (queue.length < 2) return;
+
+  const user1 = queue.shift();
+  const user2 = queue.shift();
+
+  user1.partner = user2.id;
+  user2.partner = user1.id;
+
+  user1.emit("match_found", {
+    partner: user2.userData
+  });
+
+  user2.emit("match_found", {
+    partner: user1.userData
+  });
+}
+🔧 STEP 3 — FRONTEND DISPLAY UI
+
+When match happens:
+
+socket.on("match_found", (data) => {
+  setPartner(data.partner);
+
+  setLoading(false);
+  setMatched(true);
+});
+🎨 UI REQUIREMENT
+
+Show a top info card during call:
+
+Example UI:
+👤 Username: John
+🌍 Country: Sri Lanka
+⚧ Gender: Male
+
+Must appear above video or as overlay.
+
+Must animate in smoothly.
+
+🔍 FEATURE 2 — SEO OPTIMIZATION (IMPORTANT)
+
+Make app discoverable on Google.
+
+🔧 STEP 1 — META TAGS (INDEX PAGE)
+
+Add in <head>:
+
+<title>OneChat - Random Video Chat with People Worldwide</title>
+
+<meta name="description" content="OneChat is a free random video chat platform to meet strangers worldwide instantly with filters like gender, country, and interests.">
+
+<meta name="keywords" content="stripchat alternative, livechat alternative, coomeet alternative, flingster alternative, shagle alternative, random video chat, omegle alternative, chat strangers, video call strangers, onechat, Dotcom one, dc one">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+🔧 STEP 2 — OPEN GRAPH (SOCIAL SHARING)
+<meta property="og:title" content="OneChat - Meet Strangers Instantly">
+<meta property="og:description" content="Free random video chat platform with global users">
+<meta property="og:image" content="https://i.ibb.co/nMqxN7r8/dotcom-one-1.png">
+<meta property="og:type" content="website">
+🔧 STEP 3 — TWITTER CARD
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="OneChat - Random Video Chat">
+<meta name="twitter:description" content="Meet strangers instantly with video chat">
+<meta name="twitter:image" content="https://i.ibb.co/nMqxN7r8/dotcom-one-1.png">
+🔧 STEP 4 — ROUTING SEO (IMPORTANT IF USING REACT)
+
+Ensure:
+
+/ = landing page (SEO indexable)
+/chat = app (not heavily indexed)
+
+If React SPA:
+👉 add pre-render or meta handling (React Helmet)
+
+🔧 STEP 5 — PERFORMANCE SEO
+
+Must ensure:
+
+fast load (<3s)
+lazy load video
+compress images
+avoid blocking scripts
+🚨 FINAL REQUIREMENTS
+
+After update:
+
+✔ matched users see partner info instantly
+✔ name/country/gender displayed in UI
+✔ SEO meta tags added
+✔ app is indexable on Google
+✔ social share previews work

@@ -4,6 +4,7 @@ import { logger } from "./logger";
 interface QueuedUser {
   socketId: string;
   userId: string;
+  username: string;
   gender: string;
   country: string | null;
   interests: string[];
@@ -71,6 +72,7 @@ export function setupSocketIO(io: SocketIOServer): void {
       "join_queue",
       (data: {
         userId: string;
+        username?: string;
         gender: string;
         country: string | null;
         interests: string[];
@@ -91,6 +93,7 @@ export function setupSocketIO(io: SocketIOServer): void {
         const queued: QueuedUser = {
           socketId: socket.id,
           userId: data.userId,
+          username: data.username || "Anonymous",
           gender: data.gender || "other",
           country: data.country || null,
           interests: data.interests || [],
@@ -173,16 +176,27 @@ function attemptMatch(io: SocketIOServer, seeker: QueuedUser): void {
     "Match found — emitting match_found to both",
   );
 
-  // NOTE: frontend checks data.initiator (not isInitiator)
   io.to(seeker.socketId).emit("match_found", {
     partnerId: match.socketId,
-    partnerLanguage: match.language,
     initiator: true,
+    partner: {
+      username: match.username,
+      gender: match.gender,
+      country: match.country,
+      language: match.language,
+      interests: match.interests,
+    },
   });
   io.to(match.socketId).emit("match_found", {
     partnerId: seeker.socketId,
-    partnerLanguage: seeker.language,
     initiator: false,
+    partner: {
+      username: seeker.username,
+      gender: seeker.gender,
+      country: seeker.country,
+      language: seeker.language,
+      interests: seeker.interests,
+    },
   });
 }
 
