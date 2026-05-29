@@ -5,12 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Video, Settings, UserCircle, Users, Globe2, Sparkles, LogOut } from "lucide-react";
-
-const COUNTRIES = [
-  "Any", "United States", "United Kingdom", "Canada", "Australia", "Germany", 
-  "France", "Japan", "South Korea", "Brazil", "India", "Mexico", 
-  "Spain", "Italy", "Netherlands", "Sweden", "Switzerland"
-];
+import { COUNTRIES } from "@/lib/countries";
+import logo from "/logo.png";
 
 export default function Home() {
   const { profile, signOut } = useAuth();
@@ -19,8 +15,9 @@ export default function Home() {
 
   // Filters
   const [genderPreference, setGenderPreference] = useState("any");
-  const [countryFilter, setCountryFilter] = useState("Any");
+  const [countryFilter, setCountryFilter] = useState("any");
   const [interestMatch, setInterestMatch] = useState(false);
+  const [countrySearch, setCountrySearch] = useState("");
 
   useEffect(() => {
     // Fake online count for UI demo, in a real app this would come from socket
@@ -50,9 +47,7 @@ export default function Home() {
       {/* Header */}
       <header className="w-full max-w-5xl flex justify-between items-center mb-12 z-10 glass-panel rounded-2xl px-6 py-4 mt-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center border border-primary/30">
-            <Video className="w-5 h-5 text-primary" />
-          </div>
+          <img src={logo} alt="ChatSphere" className="w-9 h-9 object-contain" />
           <span className="text-xl font-bold tracking-tight">ChatSphere</span>
         </div>
         <div className="flex items-center gap-4">
@@ -144,12 +139,36 @@ export default function Home() {
                 <label className="text-sm font-medium text-white/70 flex items-center gap-2">
                   <Globe2 className="w-4 h-4" /> Location
                 </label>
-                <Select value={countryFilter} onValueChange={setCountryFilter}>
+                <Select value={countryFilter} onValueChange={v => { setCountryFilter(v); setCountrySearch(""); }}>
                   <SelectTrigger className="glass-input bg-black/40 border-white/10" data-testid="select-filter-country">
-                    <SelectValue />
+                    {countryFilter === "any" ? (
+                      <span className="text-muted-foreground">Any country</span>
+                    ) : (
+                      <span className="flex items-center gap-2">
+                        <span>{COUNTRIES.find(c => c.name === countryFilter)?.flag}</span>
+                        <span>{countryFilter}</span>
+                      </span>
+                    )}
                   </SelectTrigger>
                   <SelectContent className="bg-background/95 backdrop-blur-xl border-white/10 max-h-64">
-                    {COUNTRIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                    <div className="px-2 pb-2 pt-1 sticky top-0 bg-background/95 z-10">
+                      <input
+                        className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white placeholder:text-white/40 outline-none focus:border-primary/50"
+                        placeholder="Search country..."
+                        value={countrySearch}
+                        onChange={e => setCountrySearch(e.target.value)}
+                        onKeyDown={e => e.stopPropagation()}
+                      />
+                    </div>
+                    <SelectItem value="any">🌍 Any country</SelectItem>
+                    {COUNTRIES.filter(c => c.name.toLowerCase().includes(countrySearch.toLowerCase())).map(c => (
+                      <SelectItem key={c.code} value={c.name}>
+                        <span className="flex items-center gap-2">
+                          <span>{c.flag}</span>
+                          <span>{c.name}</span>
+                        </span>
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>

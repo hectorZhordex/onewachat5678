@@ -4,7 +4,8 @@ import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Globe, Video, ArrowRight, ShieldCheck } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
+import logo from "/logo.png";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -45,7 +46,14 @@ export default function Login() {
       });
       if (error) throw error;
     } catch (err: any) {
-      toast({ title: "Google login failed", description: err.message, variant: "destructive" });
+      const isNotEnabled = err.message?.includes("provider is not enabled") || err.message?.includes("Unsupported provider");
+      toast({
+        title: "Google login unavailable",
+        description: isNotEnabled
+          ? "Google sign-in is not yet configured. Please enable it in your Supabase dashboard under Authentication → Providers → Google."
+          : err.message,
+        variant: "destructive",
+      });
     }
   };
 
@@ -56,14 +64,9 @@ export default function Login() {
       <div className="absolute bottom-1/4 right-1/4 w-[30rem] h-[30rem] bg-accent/10 rounded-full blur-[128px]" />
       
       <div className="z-10 w-full max-w-md p-8 rounded-3xl glass-panel animate-in fade-in zoom-in duration-700 relative">
-        <div className="flex justify-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-primary/20 flex items-center justify-center backdrop-blur-xl border border-primary/30 shadow-[0_0_30px_hsl(var(--primary)/0.3)]">
-            <Video className="w-8 h-8 text-primary" />
-          </div>
-        </div>
-        
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold tracking-tight text-white mb-2">ChatSphere</h1>
+        <div className="flex flex-col items-center mb-8">
+          <img src={logo} alt="ChatSphere" className="w-14 h-14 object-contain mb-3" />
+          <h1 className="text-3xl font-bold tracking-tight text-white mb-1">ChatSphere</h1>
           <p className="text-muted-foreground text-sm">Meet the world. One click at a time.</p>
         </div>
 
