@@ -1,20 +1,21 @@
 import { useEffect, useRef } from "react";
 
-type Ripple = {
+type SmokePuff = {
   x: number;
   y: number;
+  vx: number;
+  vy: number;
   radius: number;
-  maxRadius: number;
   alpha: number;
-  speed: number;
+  growRate: number;
 };
 
 export default function WaterRippleCanvas({ active }: { active: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const ripplesRef = useRef<Ripple[]>([]);
+  const puffsRef = useRef<SmokePuff[]>([]);
   const rafRef = useRef<number>(0);
   const activeRef = useRef(active);
-  const lastRippleRef = useRef(0);
+  const lastSpawnRef = useRef(0);
 
   useEffect(() => {
     activeRef.current = active;
@@ -36,46 +37,57 @@ export default function WaterRippleCanvas({ active }: { active: boolean }) {
     const handleMouseMove = (e: MouseEvent) => {
       if (!activeRef.current) return;
       const now = Date.now();
-      // Throttle: one ripple every ~60ms for smooth water feel
-      if (now - lastRippleRef.current < 60) return;
-      lastRippleRef.current = now;
+      if (now - lastSpawnRef.current < 18) return;
+      lastSpawnRef.current = now;
 
-      ripplesRef.current.push({
-        x: e.clientX,
-        y: e.clientY,
-        radius: 0,
-        maxRadius: 60 + Math.random() * 50,
-        alpha: 0.45 + Math.random() * 0.15,
-        speed: 1.2 + Math.random() * 1.5,
-      });
+      // Spawn a cluster of 2-3 soft smoke puffs at cursor
+      const count = 2 + Math.floor(Math.random() * 2);
+      for (let i = 0; i < count; i++) {
+        puffsRef.current.push({
+          x: e.clientX + (Math.random() - 0.5) * 16,
+          y: e.clientY + (Math.random() - 0.5) * 16,
+          vx: (Math.random() - 0.5) * 0.5,
+          vy: -(0.3 + Math.random() * 0.5), // slight upward drift
+          radius: 10 + Math.random() * 14,
+          alpha: 0.28 + Math.random() * 0.15,
+          growRate: 0.6 + Math.random() * 0.6,
+        });
+      }
 
-      if (ripplesRef.current.length > 40) ripplesRef.current.shift();
+      // Cap total puffs
+      if (puffsRef.current.length > 120) {
+        puffsRef.current.splice(0, puffsRef.current.length - 120);
+      }
     };
 
     const draw = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      ripplesRef.current = ripplesRef.current.filter(r => r.alpha > 0.008);
+      // Filter out dead puffs
+      puffsRef.current = puffsRef.current.filter(p => p.alpha > 0.005);
 
-      for (const r of ripplesRef.current) {
-        r.radius += r.speed;
-        r.alpha *= 0.955;
+      for (const p of puffsRef.current) {
+        // Move
+        p.x += p.vx;
+        p.y += p.vy;
+        // Grow and fade
+        p.radius += p.growRate;
+        p.alpha *= 0.97;
+        // Slow drift
+        p.vx *= 0.995;
+        p.vy *= 0.998;
 
-        // Outer ring
+        // Soft radial gradient — looks like smoke/glow cloud
+        const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius);
+        grad.addColorStop(0,   `rgba(140, 80, 255, ${p.alpha})`);
+        grad.addColorStop(0.35, `rgba(110, 50, 220, ${p.alpha * 0.55})`);
+        grad.addColorStop(0.7,  `rgba(80, 30, 180, ${p.alpha * 0.18})`);
+        grad.addColorStop(1,    `rgba(60, 20, 140, 0)`);
+
         ctx.beginPath();
-        ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(136, 76, 255, ${r.alpha})`;
-        ctx.lineWidth = 1.2;
-        ctx.stroke();
-
-        // Inner ring (offset)
-        if (r.radius > 12) {
-          ctx.beginPath();
-          ctx.arc(r.x, r.y, r.radius * 0.55, 0, Math.PI * 2);
-          ctx.strokeStyle = `rgba(180, 110, 255, ${r.alpha * 0.45})`;
-          ctx.lineWidth = 0.7;
-          ctx.stroke();
-        }
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
+        ctx.fill();
       }
 
       rafRef.current = requestAnimationFrame(draw);
