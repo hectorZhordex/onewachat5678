@@ -1,5 +1,4 @@
 import CursorGlow from "./cursor-glow";
-import WaterRippleCanvas from "./water-ripple-canvas";
 
 interface AnimatedBackgroundProps {
   overCard?: boolean;
@@ -60,9 +59,6 @@ export default function AnimatedBackground({ overCard = false }: AnimatedBackgro
           animation: "blob-float-2 18s ease-in-out infinite reverse",
         }}
       />
-
-      {/* Water ripple canvas — only active when NOT over card */}
-      <WaterRippleCanvas active={!overCard} />
 
       {/* Cursor glow — only active when NOT over card */}
       <CursorGlow active={!overCard} />
