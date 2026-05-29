@@ -307,7 +307,7 @@ export default function Chat() {
   // ── TEXT-ONLY LAYOUT ──────────────────────────────────────────────────────
   if (isTextOnly) {
     return (
-      <div className="h-screen w-full bg-background flex flex-col relative overflow-hidden">
+      <div className="w-full bg-background flex flex-col relative overflow-hidden" style={{ height: "100dvh" }}>
         <div className="absolute top-[-10%] right-[-5%] w-[30rem] h-[30rem] bg-primary/10 rounded-full blur-[100px] pointer-events-none" />
 
         {/* Header */}
@@ -442,7 +442,7 @@ export default function Chat() {
 
   // ── VIDEO LAYOUT ──────────────────────────────────────────────────────────
   return (
-    <div className="h-screen w-full bg-black overflow-hidden flex flex-col md:flex-row relative">
+    <div className="w-full bg-black overflow-hidden flex flex-col md:flex-row relative" style={{ height: "100dvh" }}>
 
       {/* Video Area */}
       <div className={`relative flex-1 bg-zinc-950 flex items-center justify-center ${isFullscreen ? "z-50 inset-0 absolute" : ""}`}>
