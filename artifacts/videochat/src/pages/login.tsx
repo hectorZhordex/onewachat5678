@@ -45,8 +45,8 @@ export default function Login() {
       
       <div className="z-10 w-full max-w-md p-8 rounded-3xl glass-panel animate-in fade-in zoom-in duration-700 relative">
         <div className="flex flex-col items-center mb-8">
-          <img src={logo} alt="ChatSphere" className="w-14 h-14 object-contain mb-3" />
-          <h1 className="text-3xl font-bold tracking-tight text-white mb-1">ChatSphere</h1>
+          <img src={logo} alt="OneChat" className="w-14 h-14 object-contain mb-3" />
+          <h1 className="text-3xl font-bold tracking-tight text-white mb-1">OneChat</h1>
           <p className="text-muted-foreground text-sm">Meet the world. One click at a time.</p>
         </div>
 

@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Video, Settings, UserCircle, Users, Globe2, Sparkles, LogOut } from "lucide-react";
+import { Video, MessageSquare, Settings, UserCircle, Users, Globe2, Sparkles, LogOut, CheckCircle2 } from "lucide-react";
 import { COUNTRIES } from "@/lib/countries";
 import logo from "/logo.png";
 
@@ -12,6 +12,9 @@ export default function Home() {
   const { profile, signOut } = useAuth();
   const [, setLocation] = useLocation();
   const [onlineCount, setOnlineCount] = useState(0);
+
+  // Chat mode
+  const [chatMode, setChatMode] = useState<"text" | "video" | null>(null);
 
   // Filters
   const [genderPreference, setGenderPreference] = useState("any");
@@ -29,11 +32,12 @@ export default function Home() {
   }, []);
 
   const handleStartChat = () => {
-    // Pass filters via state or query params to chat
+    if (!chatMode) return;
     const searchParams = new URLSearchParams({
       genderPref: genderPreference,
       countryPref: countryFilter,
-      interestPref: interestMatch ? "true" : "false"
+      interestPref: interestMatch ? "true" : "false",
+      mode: chatMode,
     });
     setLocation(`/chat?${searchParams.toString()}`);
   };
@@ -47,8 +51,8 @@ export default function Home() {
       {/* Header */}
       <header className="w-full max-w-5xl flex justify-between items-center mb-12 z-10 glass-panel rounded-2xl px-6 py-4 mt-4">
         <div className="flex items-center gap-3">
-          <img src={logo} alt="ChatSphere" className="w-9 h-9 object-contain" />
-          <span className="text-xl font-bold tracking-tight">ChatSphere</span>
+          <img src={logo} alt="OneChat" className="w-9 h-9 object-contain" />
+          <span className="text-xl font-bold tracking-tight">OneChat</span>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/40 border border-white/5">
@@ -93,21 +97,67 @@ export default function Home() {
         <div className="lg:col-span-8 flex flex-col gap-6">
           <div className="glass-panel rounded-3xl p-8 flex flex-col items-center justify-center min-h-[400px] relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-primary/5 pointer-events-none" />
-            
-            <div className="text-center mb-10 z-10">
-              <h2 className="text-4xl font-bold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-white to-white/60">Ready to connect?</h2>
-              <p className="text-muted-foreground text-lg">Your next great conversation is one click away.</p>
+
+            <div className="text-center mb-8 z-10">
+              <h2 className="text-4xl font-bold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-white to-white/60">How do you want to chat?</h2>
+              <p className="text-muted-foreground text-lg">Pick a mode to get started.</p>
             </div>
 
-            <Button 
+            {/* Mode Selection Cards */}
+            <div className="w-full grid grid-cols-2 gap-4 mb-8 z-10 px-2">
+              <button
+                onClick={() => setChatMode("text")}
+                data-testid="card-text-mode"
+                className={`relative flex flex-col items-center gap-3 p-6 rounded-2xl border-2 transition-all duration-200 text-left group cursor-pointer ${
+                  chatMode === "text"
+                    ? "border-primary bg-primary/15 shadow-[0_0_24px_hsl(var(--primary)/0.3)]"
+                    : "border-white/10 bg-black/30 hover:border-white/30 hover:bg-black/40"
+                }`}
+              >
+                {chatMode === "text" && (
+                  <CheckCircle2 className="absolute top-3 right-3 w-5 h-5 text-primary" />
+                )}
+                <div className={`w-14 h-14 rounded-xl flex items-center justify-center ${chatMode === "text" ? "bg-primary/30" : "bg-white/10 group-hover:bg-white/15"} transition-colors`}>
+                  <MessageSquare className={`w-7 h-7 ${chatMode === "text" ? "text-primary" : "text-white/70"}`} />
+                </div>
+                <div>
+                  <p className={`font-bold text-lg ${chatMode === "text" ? "text-white" : "text-white/80"}`}>Text Chat</p>
+                  <p className="text-xs text-white/50 mt-1">Messages only — no camera or mic needed</p>
+                </div>
+              </button>
+
+              <button
+                onClick={() => setChatMode("video")}
+                data-testid="card-video-mode"
+                className={`relative flex flex-col items-center gap-3 p-6 rounded-2xl border-2 transition-all duration-200 text-left group cursor-pointer ${
+                  chatMode === "video"
+                    ? "border-primary bg-primary/15 shadow-[0_0_24px_hsl(var(--primary)/0.3)]"
+                    : "border-white/10 bg-black/30 hover:border-white/30 hover:bg-black/40"
+                }`}
+              >
+                {chatMode === "video" && (
+                  <CheckCircle2 className="absolute top-3 right-3 w-5 h-5 text-primary" />
+                )}
+                <div className={`w-14 h-14 rounded-xl flex items-center justify-center ${chatMode === "video" ? "bg-primary/30" : "bg-white/10 group-hover:bg-white/15"} transition-colors`}>
+                  <Video className={`w-7 h-7 ${chatMode === "video" ? "text-primary" : "text-white/70"}`} />
+                </div>
+                <div>
+                  <p className={`font-bold text-lg ${chatMode === "video" ? "text-white" : "text-white/80"}`}>Video Chat</p>
+                  <p className="text-xs text-white/50 mt-1">Live video + text with your match</p>
+                </div>
+              </button>
+            </div>
+
+            <Button
               onClick={handleStartChat}
-              className="group relative w-64 h-20 bg-primary hover:bg-primary/90 rounded-2xl text-xl font-bold shadow-[0_0_40px_hsl(var(--primary)/0.5)] hover:shadow-[0_0_60px_hsl(var(--primary)/0.7)] transition-all duration-300 overflow-hidden"
+              disabled={!chatMode}
+              className="group relative w-64 h-16 bg-primary hover:bg-primary/90 rounded-2xl text-lg font-bold shadow-[0_0_40px_hsl(var(--primary)/0.5)] hover:shadow-[0_0_60px_hsl(var(--primary)/0.7)] transition-all duration-300 overflow-hidden disabled:opacity-40 disabled:cursor-not-allowed z-10"
               data-testid="button-start-chat"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-[200%] group-hover:translate-x-[200%] transition-transform duration-1000" />
               <div className="flex items-center justify-center gap-3">
-                <Video className="w-6 h-6" />
-                Start Chat
+                {chatMode === "text" ? <MessageSquare className="w-5 h-5" /> : <Video className="w-5 h-5" />}
+                {chatMode ? `Start ${chatMode === "text" ? "Text" : "Video"} Chat` : "Select a Mode"}
               </div>
             </Button>
           </div>

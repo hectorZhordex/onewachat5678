@@ -110,7 +110,7 @@ export default function Onboarding() {
 
       <div className="w-full max-w-xl glass-panel rounded-3xl p-8 relative z-10 animate-in slide-in-from-bottom-8 duration-700">
         <div className="flex flex-col items-center mb-10 text-center">
-          <img src={logo} alt="ChatSphere" className="w-14 h-14 object-contain mb-2" />
+          <img src={logo} alt="OneChat" className="w-14 h-14 object-contain mb-2" />
           <h1 className="text-3xl font-bold mb-2">Create Your Persona</h1>
           <p className="text-muted-foreground">Setup your profile to find better matches.</p>
         </div>
@@ -228,7 +228,7 @@ export default function Onboarding() {
           className="w-full h-14 mt-10 bg-primary hover:bg-primary/90 text-white rounded-xl text-lg font-medium shadow-[0_0_20px_hsl(var(--primary)/0.4)] hover:shadow-[0_0_30px_hsl(var(--primary)/0.6)] transition-all"
           data-testid="button-save-profile"
         >
-          {upsertProfile.isPending ? "Saving..." : (profile ? "Save Changes" : "Enter ChatSphere")}
+          {upsertProfile.isPending ? "Saving..." : (profile ? "Save Changes" : "Enter OneChat")}
         </Button>
       </div>
     </div>
