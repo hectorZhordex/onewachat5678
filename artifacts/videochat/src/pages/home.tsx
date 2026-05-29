@@ -242,6 +242,13 @@ export default function Home() {
         </div>
 
       </main>
+
+      {/* Footer */}
+      <footer className="w-full max-w-5xl z-10 mt-4 mb-2 text-center">
+        <p className="text-xs text-white/20">
+          © OneChat {new Date().getFullYear()}. All Rights Reserved.
+        </p>
+      </footer>
     </div>
   );
 }

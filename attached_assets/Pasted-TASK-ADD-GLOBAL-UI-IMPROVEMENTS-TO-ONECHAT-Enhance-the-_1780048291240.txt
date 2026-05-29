@@ -1,0 +1,144 @@
+TASK: ADD GLOBAL UI IMPROVEMENTS TO ONECHAT
+
+Enhance the OneChat login + UI system with:
+
+🧾 FEATURE 1 — AUTO UPDATING COPYRIGHT FOOTER
+
+Add footer:
+
+© OneChat {CURRENT_YEAR}. All Rights Reserved.
+🔧 IMPLEMENTATION RULE
+
+Year must be dynamic:
+
+const year = new Date().getFullYear();
+🎨 FOOTER UI
+
+Must appear:
+
+bottom of login page
+bottom of landing page
+subtle glassmorphism style
+small text
+low opacity
+
+Example:
+
+© OneChat 2026. All Rights Reserved.
+⚖️ FEATURE 2 — TERMS & CONDITIONS POPUP (ON LOGIN)
+🚨 REQUIREMENT
+
+When user logs in OR opens app first time:
+
+👉 show Terms modal BEFORE accessing app
+
+🔧 MODAL RULES
+must match dark glass UI theme
+blurred background overlay
+centered card
+scrollable text
+Accept button required
+Decline → blocks access
+🧠 LOGIC
+if (!localStorage.getItem("onechat_terms_accepted")) {
+    showTermsModal();
+}
+
+On accept:
+
+localStorage.setItem("onechat_terms_accepted", "true");
+🎨 TERMS UI STYLE
+glassmorphism panel
+soft purple glow (#884cff)
+smooth fade-in animation
+rounded corners (20–24px)
+🌌 FEATURE 3 — ANIMATED GLOW BACKGROUND (LOGIN SCREEN)
+🎯 REQUIREMENT
+
+Login screen must have:
+
+animated glowing blobs
+slow movement
+blurred neon light effect
+purple theme (#884cff)
+deep black background
+🔧 IMPLEMENTATION (CANVAS OR DIV LAYERS)
+
+Create background layer:
+
+body {
+    background: #05060a;
+    overflow: hidden;
+}
+🌈 GLOW ORBS
+
+Add multiple floating circles:
+
+.glow {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    background: #884cff;
+    filter: blur(120px);
+    opacity: 0.4;
+    border-radius: 50%;
+    animation: float 10s infinite ease-in-out;
+}
+🎞 ANIMATION
+@keyframes float {
+    0% { transform: translate(0,0); }
+    50% { transform: translate(100px,-80px); }
+    100% { transform: translate(0,0); }
+}
+🖱 FEATURE 4 — MOUSE FOLLOW LIGHT EFFECT (IMPORTANT)
+🎯 WHAT THIS IS
+
+When user moves mouse:
+
+👉 glowing light follows cursor
+👉 soft trailing effect
+👉 interactive background glow reacts
+
+🔧 IMPLEMENTATION
+
+Add cursor glow div:
+
+<div id="cursorGlow"></div>
+🎨 STYLE
+#cursorGlow {
+    position: fixed;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(136,76,255,0.4), transparent 70%);
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    filter: blur(20px);
+}
+🧠 MOUSE TRACKING JS
+document.addEventListener("mousemove", (e) => {
+    const glow = document.getElementById("cursorGlow");
+    glow.style.left = e.clientX + "px";
+    glow.style.top = e.clientY + "px";
+});
+🎨 FINAL UI EXPERIENCE
+
+Login screen must feel like:
+
+🌌 futuristic neon glass UI
+🟣 purple glowing atmosphere (#884cff)
+🖱 interactive mouse light trail
+⚖️ terms popup before access
+🧾 clean copyright footer
+🚨 IMPORTANT RULES
+Do NOT break existing auth system
+Do NOT remove Supabase login
+Ensure mobile responsiveness
+Ensure animations are smooth (no lag)
+Keep UI consistent with OneChat theme
+🎯 FINAL RESULT REQUIRED
+
+✔ dynamic footer year
+✔ terms popup on first login
+✔ animated glowing background
+✔ mouse-follow light effect
+✔ modern glass UI consistency
