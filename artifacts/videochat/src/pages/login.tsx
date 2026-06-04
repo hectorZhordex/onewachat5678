@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { ShieldCheck } from "lucide-react";
 import logo from "/logo.png";
-import TermsModal from "@/components/terms-modal";
 import AnimatedBackground from "@/components/animated-background";
 
 const year = new Date().getFullYear();
@@ -46,9 +45,6 @@ export default function Login() {
       className="min-h-screen w-full flex flex-col items-center justify-center relative overflow-hidden"
       style={{ background: "#05060a" }}
     >
-      {/* Terms modal */}
-      <TermsModal />
-
       {/* Animated blobs + water ripple + cursor glow */}
       <AnimatedBackground overCard={overCard} />
 

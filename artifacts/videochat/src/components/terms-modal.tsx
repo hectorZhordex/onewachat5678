@@ -1,39 +1,37 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ShieldCheck, X } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 
-const STORAGE_KEY = "onechat_terms_accepted";
+interface TermsModalProps {
+  onAccept?: () => void;
+}
 
-export default function TermsModal() {
+export default function TermsModal({ onAccept }: TermsModalProps) {
   const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    if (!localStorage.getItem(STORAGE_KEY)) {
-      setOpen(true);
-    }
+    // Always show on every visit — no memory
+    setOpen(true);
   }, []);
 
   const handleAccept = () => {
-    localStorage.setItem(STORAGE_KEY, "true");
+    // Mark guest session start time for the 2-minute timer
+    sessionStorage.setItem("guest_session_start", Date.now().toString());
     setOpen(false);
+    onAccept?.();
   };
 
   if (!open) return null;
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
-      {/* Blurred overlay */}
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm animate-in fade-in duration-300" />
 
-      {/* Modal card */}
       <div className="relative z-10 w-full max-w-lg animate-in fade-in zoom-in-95 duration-300">
-        {/* Glow behind card */}
         <div className="absolute inset-0 rounded-3xl blur-2xl opacity-30 bg-[#884cff] scale-95 pointer-events-none" />
 
         <div className="relative rounded-3xl border border-white/10 bg-black/80 backdrop-blur-2xl shadow-[0_0_60px_rgba(136,76,255,0.25)] overflow-hidden">
-          {/* Header */}
           <div className="px-6 pt-6 pb-4 border-b border-white/5">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center border border-primary/30">
@@ -46,15 +44,7 @@ export default function TermsModal() {
             </div>
           </div>
 
-          {/* Scrollable terms */}
-          <ScrollArea
-            className="h-64 px-6 py-4"
-            onScrollCapture={(e: React.UIEvent<HTMLDivElement>) => {
-              const el = e.currentTarget;
-              const atBottom = el.scrollHeight - el.scrollTop <= el.clientHeight + 40;
-              if (atBottom) setScrolled(true);
-            }}
-          >
+          <ScrollArea className="h-64 px-6 py-4">
             <div className="space-y-4 text-sm text-white/70 leading-relaxed pr-2">
               <p>Welcome to <strong className="text-white">OneChat</strong>. By using this platform, you agree to these Terms & Conditions. Please read them carefully.</p>
 
@@ -102,7 +92,6 @@ export default function TermsModal() {
             </div>
           </ScrollArea>
 
-          {/* Footer */}
           <div className="px-6 pb-6 pt-4 border-t border-white/5 flex flex-col sm:flex-row gap-3">
             <Button
               onClick={handleAccept}

@@ -4,6 +4,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import TermsModal from "@/components/terms-modal";
+import GuestTimer from "@/components/guest-timer";
 
 import NotFound from "@/pages/not-found";
 import Login from "@/pages/login";
@@ -36,6 +38,9 @@ function App() {
       <AuthProvider>
         <TooltipProvider>
           <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+            {/* Terms shown on every visit, guest timer bar at top */}
+            <TermsModal />
+            <GuestTimer />
             <Router />
           </WouterRouter>
           <Toaster />

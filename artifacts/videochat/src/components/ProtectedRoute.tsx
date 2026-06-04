@@ -2,6 +2,15 @@ import React, { useEffect } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
 
+const GUEST_DURATION = 120; // 2 minutes in seconds
+
+function hasValidGuestSession(): boolean {
+  const raw = sessionStorage.getItem("guest_session_start");
+  if (!raw) return false;
+  const elapsed = Math.floor((Date.now() - Number(raw)) / 1000);
+  return elapsed < GUEST_DURATION;
+}
+
 type ProtectedRouteProps = {
   component: React.ComponentType<any>;
   requireProfile?: boolean;
@@ -13,9 +22,9 @@ export function ProtectedRoute({ component: Component, requireProfile = true }: 
 
   useEffect(() => {
     if (!loading) {
-      if (!user) {
+      if (!user && !hasValidGuestSession()) {
         setLocation("/login");
-      } else if (requireProfile && !profile) {
+      } else if (user && requireProfile && !profile) {
         setLocation("/onboarding");
       }
     }
@@ -32,9 +41,8 @@ export function ProtectedRoute({ component: Component, requireProfile = true }: 
     );
   }
 
-  if (!user || (requireProfile && !profile)) {
-    return null; // Will redirect in useEffect
-  }
+  if (!user && !hasValidGuestSession()) return null;
+  if (user && requireProfile && !profile) return null;
 
   return <Component />;
 }
